@@ -25,7 +25,9 @@ const PlayerDiv = styled.div`
     color: ${({ playerIndex }) => colors[playerIndex]};
 `;
 
-export default function ScoreIndicator({ score, playerIndex } : {score: number, playerIndex: number}) {
+type Props = {score: number, playerIndex: number};
+
+export default function ScoreIndicator({ score, playerIndex } : Props) {
     return (
         <OuterDiv>
             <ScoreDiv>
