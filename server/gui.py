@@ -18,7 +18,7 @@ class HogLoggingException(Exception):
 
 
 @route
-def take_turn(scores, num_rolls, prev_rolls):
+def take_turn(prev_rolls, move_history):
     fair_dice = dice.make_fair_dice(6)
     dice_results = []
 
@@ -39,25 +39,39 @@ def take_turn(scores, num_rolls, prev_rolls):
     )
 
     def log(*logged_scores):
-        nonlocal final_scores, final_message
+        nonlocal final_scores, final_message, commentary
         final_scores = logged_scores
         f = io.StringIO()
         with redirect_stdout(f):
-            commentary(*logged_scores)
+            commentary = commentary(*logged_scores)
         final_message = f.getvalue()
-        if len(dice_results) == len(prev_rolls) + num_rolls:
-            raise HogLoggingException()
+        return log
 
-    strategy0 = lambda s1, s2: num_rolls
-    strategy1 = None  # should never be called
-    goal = 100
+    move_cnt = 0
+
+    def strategy(*args):
+        nonlocal move_cnt
+        if move_cnt == len(move_history):
+            raise HogLoggingException()
+        move = move_history[move_cnt]
+        move_cnt += 1
+        return move
+
+    game_over = False
 
     try:
-        hog.play(strategy0, strategy1, *scores, logged_dice, goal, log)
+        hog.play(strategy, strategy, dice=logged_dice, say=log)
     except HogLoggingException:
         pass
+    else:
+        game_over = True
 
-    return {"rolls": dice_results, "finalScores": final_scores, "message": final_message}
+    return {
+        "rolls": dice_results,
+        "finalScores": final_scores,
+        "message": final_message,
+        "gameOver": game_over,
+    }
 
 
 app = start(PORT, DEFAULT_SERVER, GUI_FOLDER)
