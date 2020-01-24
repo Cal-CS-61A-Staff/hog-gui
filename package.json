@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && rm -rf deploy && mkdir deploy && mv build deploy/gui_files && cp -r server/ deploy",
+    "build": "react-scripts build && rm -rf deploy && mkdir deploy && mv build deploy/gui_files && cp -r server/* deploy",
     "deploy": "cd deploy/ && rm -rf .git && git init && git add -A && git commit -m \"init\" && git remote add dokku dokku@apps.cs61a.org:hog && git push --force dokku master",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
