@@ -18,7 +18,7 @@ class HogLoggingException(Exception):
 
 
 @route
-def take_turn(prev_rolls, move_history):
+def take_turn(prev_rolls, move_history, goal):
     fair_dice = dice.make_fair_dice(6)
     dice_results = []
 
@@ -60,7 +60,7 @@ def take_turn(prev_rolls, move_history):
     game_over = False
 
     try:
-        hog.play(strategy, strategy, dice=logged_dice, say=log)
+        hog.play(strategy, strategy, dice=logged_dice, say=log, goal=goal)
     except HogLoggingException:
         pass
     else:
@@ -72,6 +72,16 @@ def take_turn(prev_rolls, move_history):
         "message": final_message,
         "gameOver": game_over,
     }
+
+
+@route
+def strategy(name, scores):
+    STRATEGIES = {
+        "bacon_strategy": hog.bacon_strategy,
+        "swap_strategy": hog.swap_strategy,
+        "final_strategy": hog.final_strategy,
+    }
+    return STRATEGIES[name](*scores[::-1])
 
 
 app = start(PORT, DEFAULT_SERVER, GUI_FOLDER)

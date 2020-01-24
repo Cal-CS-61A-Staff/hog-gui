@@ -17,9 +17,15 @@ const CenteredDiv = styled.div`
 
 export default function App() {
     const [gameKey, setGameKey] = useState(0);
+    const [strategy, setStrategy] = useState(null);
 
     const handleRestart = () => {
         setGameKey((key) => key + 1);
+    };
+
+    const handleStrategyChange = (newStrategy) => {
+        setStrategy(newStrategy);
+        handleRestart();
     };
 
     return (
@@ -35,7 +41,12 @@ export default function App() {
                     </CenteredDiv>
                 </Col>
             </Row>
-            <Game key={gameKey} onRestart={handleRestart} />
+            <Game
+                key={gameKey}
+                strategy={strategy}
+                onRestart={handleRestart}
+                onStrategyChange={handleStrategyChange}
+            />
         </Container>
     );
 }
