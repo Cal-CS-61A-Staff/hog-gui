@@ -4,6 +4,7 @@ import socketserver
 import ssl
 import traceback
 import webbrowser
+import os
 from http import HTTPStatus, server
 from http.server import HTTPServer
 from urllib.parse import unquote
@@ -164,7 +165,8 @@ def start(port, default_server, gui_folder):
     args, unknown = parser.parse_known_args()
 
     import __main__
-    if __main__.__file__.endswith("gui.py") and not args.f:
+    
+    if not "gunicorn" in os.environ.get("SERVER_SOFTWARE", "") and not args.f:
         start_client(port, default_server, gui_folder, args.s)
     else:
         app = start_server()

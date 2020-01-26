@@ -134,4 +134,5 @@ def trace_play(play, strategy0, strategy1, score0, score1, dice, goal, say, fera
     return s0, s1, game_trace
 
 
-app = start(PORT, DEFAULT_SERVER, GUI_FOLDER)
+if __name__ == "__main__":
+    app = start(PORT, DEFAULT_SERVER, GUI_FOLDER)
