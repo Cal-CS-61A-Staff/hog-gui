@@ -51,7 +51,7 @@ class Handler(server.BaseHTTPRequestHandler):
 
     def do_POST(self):
         content_length = int(self.headers["Content-Length"])
-        raw_data = self.rfile.read(content_length)
+        raw_data = self.rfile.read(content_length).decode("utf-8")
         data = json.loads(raw_data)
         path = unquote(self.path)
 
@@ -165,7 +165,7 @@ def start(port, default_server, gui_folder):
     args, unknown = parser.parse_known_args()
 
     import __main__
-    
+
     if not "gunicorn" in os.environ.get("SERVER_SOFTWARE", "") and not args.f:
         start_client(port, default_server, gui_folder, args.s)
     else:
