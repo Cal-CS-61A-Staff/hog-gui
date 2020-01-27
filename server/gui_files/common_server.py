@@ -115,10 +115,13 @@ def start_server():
     global IS_SERVER
     IS_SERVER = True
     from flask import Flask, request, jsonify, send_from_directory
+
     app = Flask(__name__, static_url_path="", static_folder="")
     for route, handler in PATHS.items():
+
         def wrapped_handler():
             return jsonify(handler(**snakify(request.get_json(force=True))))
+
         app.add_url_rule(route, handler.__name__, wrapped_handler, methods=["POST"])
 
     @app.route("/")
@@ -159,14 +162,12 @@ def start(port, default_server, gui_folder):
     parser.add_argument(
         "-s", help="Stand-alone: do not open browser", action="store_true"
     )
-    parser.add_argument(
-        "-f", help="Force Flask app", action="store_true"
-    )
+    parser.add_argument("-f", help="Force Flask app", action="store_true")
     args, unknown = parser.parse_known_args()
 
     import __main__
 
-    if not "gunicorn" in os.environ.get("SERVER_SOFTWARE", "") and not args.f:
+    if "gunicorn" not in os.environ.get("SERVER_SOFTWARE", "") and not args.f:
         start_client(port, default_server, gui_folder, args.s)
     else:
         app = start_server()
