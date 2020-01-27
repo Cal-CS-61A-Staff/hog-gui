@@ -119,7 +119,7 @@ def start_server():
     app = Flask(__name__, static_url_path="", static_folder="")
     for route, handler in PATHS.items():
 
-        def wrapped_handler():
+        def wrapped_handler(handler=handler):
             return jsonify(handler(**snakify(request.get_json(force=True))))
 
         app.add_url_rule(route, handler.__name__, wrapped_handler, methods=["POST"])
