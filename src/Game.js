@@ -2,7 +2,9 @@
 import React, { useRef, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import type { RuleSet } from "./App";
 import ComputerRollDisplay from "./ComputerRollDisplay";
+import GameOptions from "./GameOptions";
 import StrategyPicker from "./StrategyPicker";
 import Commentary from "./Commentary";
 import DiceResults from "./DiceResults";
@@ -26,9 +28,17 @@ const goal = 100;
 
 type State = $Keys<typeof states>;
 
-type Props = { onRestart: () => mixed, strategy: ?string, onStrategyChange: (?string) => mixed };
+type Props = {
+    onRestart: () => mixed,
+    strategy: ?string,
+    onStrategyChange: (?string) => mixed,
+    gameRules: RuleSet,
+    onGameRulesChange: (string, boolean) => mixed
+};
 
-export default function Game({ onRestart, strategy, onStrategyChange } : Props) {
+export default function Game({
+    onRestart, strategy, onStrategyChange, gameRules, onGameRulesChange,
+} : Props) {
     const [state, setState] = useState<State>(states.WAITING_FOR_INPUT);
     const [displayedRolls, setDisplayedRolls] = useState<number[]>([]);
     const [playerIndex, setPlayerIndex] = useState(0);
@@ -39,7 +49,7 @@ export default function Game({ onRestart, strategy, onStrategyChange } : Props) 
     const moveHistory = useRef([]);
     const rollHistory = useRef([]);
 
-    const handleRoll = async (inputNumRolls, currPlayerIndex=playerIndex) => {
+    const handleRoll = async (inputNumRolls, currPlayerIndex = playerIndex) => {
         setState(states.ROLLING_DICE);
         setNumRolls(inputNumRolls);
         moveHistory.current.push(inputNumRolls);
@@ -48,6 +58,7 @@ export default function Game({ onRestart, strategy, onStrategyChange } : Props) 
                 prevRolls: rollHistory.current,
                 moveHistory: moveHistory.current,
                 goal,
+                gameRules,
             }),
             ...[inputNumRolls && wait(1000)],
         ]);
@@ -75,7 +86,7 @@ export default function Game({ onRestart, strategy, onStrategyChange } : Props) 
         [states.WAITING_FOR_INPUT]: (
             <RollButton
                 playerIndex={playerIndex}
-                rolling={state === states.ROLLING_DICE}
+                freeBacon={gameRules["Free Bacon"]}
                 onClick={handleRoll}
                 onRestart={onRestart}
             />
@@ -110,11 +121,24 @@ export default function Game({ onRestart, strategy, onStrategyChange } : Props) 
             )}
             {state === states.WAITING_FOR_INPUT
             && (
-                <Row>
-                    <Col>
-                        <StrategyPicker strategy={strategy} onStrategyChange={onStrategyChange} />
-                    </Col>
-                </Row>
+                <>
+                    <Row>
+                        <Col>
+                            <StrategyPicker
+                                strategy={strategy}
+                                onStrategyChange={onStrategyChange}
+                            />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <GameOptions
+                                gameRules={gameRules}
+                                onGameRulesChange={onGameRulesChange}
+                            />
+                        </Col>
+                    </Row>
+                </>
             )}
         </>
     );

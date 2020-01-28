@@ -12,9 +12,13 @@ const Wrapper = styled.div`
     margin: 20px;
 `;
 
-type Props = { playerIndex: number, onClick: (number) => mixed, onRestart: () => mixed};
+type Props = {|
+    playerIndex: number, freeBacon: boolean, onClick: (number) => mixed, onRestart: () => mixed
+|};
 
-export default function RollButton({ playerIndex, onClick, onRestart }: Props) {
+export default function RollButton({
+    playerIndex, freeBacon, onClick, onRestart,
+} : Props) {
     const [numberOfRolls, setNumberOfRolls] = useState(0);
 
     const handleChange = (e) => {
@@ -41,7 +45,7 @@ export default function RollButton({ playerIndex, onClick, onRestart }: Props) {
             <p>
                 Roll
                 {" "}
-                <input type="number" min={0} max={10} value={numberOfRolls} onChange={handleChange} />
+                <input type="number" min={freeBacon ? 0 : 1} max={10} value={numberOfRolls} onChange={handleChange} />
                 {" "}
             Dice.
             </p>

@@ -19,9 +19,15 @@ class HogLoggingException(Exception):
 
 
 @route
-def take_turn(prev_rolls, move_history, goal):
+def take_turn(prev_rolls, move_history, goal, game_rules):
     fair_dice = dice.make_fair_dice(6)
     dice_results = []
+
+    feral_hogs = game_rules["Feral Hogs"]
+    swine_swap = game_rules["Swine Swap"]
+
+    if not swine_swap:
+        old_is_swap, hog.is_swap = hog.is_swap, lambda score0, score1: False
 
     def logged_dice():
         if len(dice_results) < len(prev_rolls):
@@ -61,11 +67,14 @@ def take_turn(prev_rolls, move_history, goal):
     game_over = False
 
     try:
-        trace_play(hog.play, strategy, strategy, 0, 0, dice=logged_dice, say=log, goal=goal, feral_hogs=True)
+        trace_play(hog.play, strategy, strategy, 0, 0, dice=logged_dice, say=log, goal=goal, feral_hogs=feral_hogs)
     except HogLoggingException:
         pass
     else:
         game_over = True
+
+    if not swine_swap:
+        hog.is_swap = old_is_swap
 
     return {
         "rolls": dice_results,

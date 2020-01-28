@@ -25,7 +25,7 @@ const Wrapper = styled.div`
     margin: 20px;
 `;
 
-type Props = {winner: number, onRestart: () => mixed, onStrategyChange: ?string => mixed};
+type Props = {|winner: number, onRestart: () => mixed, onStrategyChange: ?string => mixed|};
 
 export default function VictoryScreen({ winner, onRestart, onStrategyChange }: Props) {
     return (

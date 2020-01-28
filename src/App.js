@@ -15,12 +15,29 @@ const CenteredDiv = styled.div`
     font-weight: bold;
 `;
 
+export type RuleSet = {|
+    "Free Bacon": boolean,
+    "Feral Hogs": boolean,
+    "Swine Swap": boolean,
+|};
+
 export default function App() {
     const [gameKey, setGameKey] = useState(0);
     const [strategy, setStrategy] = useState(null);
 
+    const [gameRules, setGameRules] = useState<RuleSet>({
+        "Free Bacon": false,
+        "Feral Hogs": true,
+        "Swine Swap": false,
+    });
+
     const handleRestart = () => {
         setGameKey((key) => key + 1);
+    };
+
+    const handleGameRulesChange = (rule, val) => {
+        setGameRules({ ...gameRules, [rule]: val });
+        handleRestart();
     };
 
     const handleStrategyChange = (newStrategy) => {
@@ -46,6 +63,8 @@ export default function App() {
                 strategy={strategy}
                 onRestart={handleRestart}
                 onStrategyChange={handleStrategyChange}
+                gameRules={gameRules}
+                onGameRulesChange={handleGameRulesChange}
             />
         </Container>
     );
