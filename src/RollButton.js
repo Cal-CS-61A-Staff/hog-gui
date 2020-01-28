@@ -19,10 +19,12 @@ type Props = {|
 export default function RollButton({
     playerIndex, freeBacon, onClick, onRestart,
 } : Props) {
-    const [numberOfRolls, setNumberOfRolls] = useState(0);
+    const min = freeBacon ? 0 : 1;
+
+    const [numberOfRolls, setNumberOfRolls] = useState(min);
 
     const handleChange = (e) => {
-        const val = Math.max(Math.min(10, e.target.value), 0);
+        const val = Math.max(Math.min(10, e.target.value), min);
         setNumberOfRolls(e.target.value && val);
     };
 
@@ -45,7 +47,7 @@ export default function RollButton({
             <p>
                 Roll
                 {" "}
-                <input type="number" min={freeBacon ? 0 : 1} max={10} value={numberOfRolls} onChange={handleChange} />
+                <input type="number" min={min} max={10} value={numberOfRolls} onChange={handleChange} />
                 {" "}
             Dice.
             </p>
