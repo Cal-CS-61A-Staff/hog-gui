@@ -46,8 +46,7 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
     )
 
     def log(*logged_scores):
-        nonlocal final_scores, final_message, commentary
-        final_scores = logged_scores
+        nonlocal final_message, commentary
         f = io.StringIO()
         with redirect_stdout(f):
             commentary = commentary(*logged_scores)
@@ -56,8 +55,11 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
 
     move_cnt = 0
 
-    def strategy(*args):
-        nonlocal move_cnt
+    def strategy(*scores):
+        nonlocal final_scores, move_cnt
+        final_scores = scores
+        if move_cnt % 2:
+            final_scores = final_scores[::-1]
         if move_cnt == len(move_history):
             raise HogLoggingException()
         move = move_history[move_cnt]
@@ -67,7 +69,7 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
     game_over = False
 
     try:
-        trace_play(hog.play, strategy, strategy, 0, 0, dice=logged_dice, say=log, goal=goal, feral_hogs=feral_hogs)
+        final_scores = trace_play(hog.play, strategy, strategy, 0, 0, dice=logged_dice, say=log, goal=goal, feral_hogs=feral_hogs)[:2]
     except HogLoggingException:
         pass
     else:
