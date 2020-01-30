@@ -95,6 +95,16 @@ def strategy(name, scores):
     }
     return STRATEGIES[name](*scores[::-1])
 
+def safe(commentary):
+    def new_commentary(*args, **kwargs):
+        try:
+            result = commentary(*args, **kwargs)
+        except TypeError as e:
+            print("Error in commentary function")
+            result = commentary
+        return safe(result)
+    return new_commentary
+
 
 def trace_play(play, strategy0, strategy1, score0, score1, dice, goal, say, feral_hogs):
     """Wraps the user's play function and
@@ -140,7 +150,7 @@ def trace_play(play, strategy0, strategy1, score0, score1, dice, goal, say, fera
         score1,
         dice=mod_dice,
         goal=goal,
-        say=say,
+        say=safe(say),
         feral_hogs=feral_hogs,
     )
     return s0, s1, game_trace
