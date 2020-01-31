@@ -26,57 +26,58 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
     feral_hogs = game_rules["Feral Hogs"]
     swine_swap = game_rules["Swine Swap"]
 
-    if not swine_swap:
-        old_is_swap, hog.is_swap = hog.is_swap, lambda score0, score1: False
-
-    def logged_dice():
-        if len(dice_results) < len(prev_rolls):
-            out = prev_rolls[len(dice_results)]
-        else:
-            out = fair_dice()
-        dice_results.append(out)
-        return out
-
-    final_scores = None
-    final_message = None
-
-    commentary = hog.both(
-        hog.announce_highest(0),
-        hog.both(hog.announce_highest(1), hog.announce_lead_changes()),
-    )
-
-    def log(*logged_scores):
-        nonlocal final_message, commentary
-        f = io.StringIO()
-        with redirect_stdout(f):
-            commentary = commentary(*logged_scores)
-        final_message = f.getvalue()
-        return log
-
-    move_cnt = 0
-
-    def strategy(*scores):
-        nonlocal final_scores, move_cnt
-        final_scores = scores
-        if move_cnt % 2:
-            final_scores = final_scores[::-1]
-        if move_cnt == len(move_history):
-            raise HogLoggingException()
-        move = move_history[move_cnt]
-        move_cnt += 1
-        return move
-
-    game_over = False
-
     try:
-        final_scores = trace_play(hog.play, strategy, strategy, 0, 0, dice=logged_dice, say=log, goal=goal, feral_hogs=feral_hogs)[:2]
-    except HogLoggingException:
-        pass
-    else:
-        game_over = True
+        if not swine_swap:
+            old_is_swap, hog.is_swap = hog.is_swap, lambda score0, score1: False
 
-    if not swine_swap:
-        hog.is_swap = old_is_swap
+        def logged_dice():
+            if len(dice_results) < len(prev_rolls):
+                out = prev_rolls[len(dice_results)]
+            else:
+                out = fair_dice()
+            dice_results.append(out)
+            return out
+
+        final_scores = None
+        final_message = None
+
+        commentary = hog.both(
+            hog.announce_highest(0),
+            hog.both(hog.announce_highest(1), hog.announce_lead_changes()),
+        )
+
+        def log(*logged_scores):
+            nonlocal final_message, commentary
+            f = io.StringIO()
+            with redirect_stdout(f):
+                commentary = commentary(*logged_scores)
+            final_message = f.getvalue()
+            return log
+
+        move_cnt = 0
+
+        def strategy(*scores):
+            nonlocal final_scores, move_cnt
+            final_scores = scores
+            if move_cnt % 2:
+                final_scores = final_scores[::-1]
+            if move_cnt == len(move_history):
+                raise HogLoggingException()
+            move = move_history[move_cnt]
+            move_cnt += 1
+            return move
+
+        game_over = False
+
+        try:
+            final_scores = trace_play(hog.play, strategy, strategy, 0, 0, dice=logged_dice, say=log, goal=goal, feral_hogs=feral_hogs)[:2]
+        except HogLoggingException:
+            pass
+        else:
+            game_over = True
+    finally:
+        if not swine_swap:
+            hog.is_swap = old_is_swap
 
     return {
         "rolls": dice_results,
