@@ -39,7 +39,7 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 
 ### `yarn deploy`
 
-Before deploying your build, make sure that the `hog.py` file is present in the `deploy` directory. If not, copy it from the [website repo](https://github.com/Cal-CS-61A-Staff/berkeley-cs61a/blob/master/src/proj/hog/hog.py). Then run `yarn deploy` and you'll be able to test the updated app at https://hog.cs61a.org/.
+Before deploying your build, make sure that the `hog.py` file is present in the `deploy` directory. If not, copy it from the [website repo](https://github.com/Cal-CS-61A-Staff/berkeley-cs61a/blob/master/src/proj/hog/hog.py). Then run `yarn deploy` and you'll be able to see the updated app at https://hog.cs61a.org/.
 
 
 ## Learn More
