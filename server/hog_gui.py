@@ -23,12 +23,15 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
     fair_dice = dice.make_fair_dice(6)
     dice_results = []
 
-    feral_hogs = game_rules["Feral Hogs"]
-    swine_swap = game_rules["Swine Swap"]
+    swine_align = game_rules["Swine Align"]
+    pig_pass = game_rules["Pig Pass"]
 
     try:
-        if not swine_swap:
-            old_is_swap, hog.is_swap = hog.is_swap, lambda score0, score1: False
+        if not swine_align:
+            old_swine_align, hog.swine_align = hog.swine_align, lambda score0, score1: False
+
+        if not pig_pass:
+            old_pig_pass, hog.pig_pass = hog.pig_pass, lambda score0, score1: False
 
         def logged_dice():
             if len(dice_results) < len(prev_rolls):
@@ -70,14 +73,16 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
         game_over = False
 
         try:
-            final_scores = trace_play(hog.play, strategy, strategy, 0, 0, dice=logged_dice, say=log, goal=goal, feral_hogs=feral_hogs)[:2]
+            final_scores = trace_play(hog.play, strategy, strategy, 0, 0, dice=logged_dice, say=log, goal=goal)[:2]
         except HogLoggingException:
             pass
         else:
             game_over = True
     finally:
-        if not swine_swap:
-            hog.is_swap = old_is_swap
+        if not swine_align:
+            hog.swine_align = old_swine_align
+        if not pig_pass:
+            hog.pig_pass = old_pig_pass
 
     return {
         "rolls": dice_results,
@@ -91,7 +96,7 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
 def strategy(name, scores):
     STRATEGIES = {
         "bacon_strategy": hog.bacon_strategy,
-        "swap_strategy": hog.swap_strategy,
+        "extra_turn_strategy": hog.extra_turn_strategy,
         "final_strategy": hog.final_strategy,
     }
     return STRATEGIES[name](*scores[::-1])
@@ -107,7 +112,7 @@ def safe(commentary):
     return new_commentary
 
 
-def trace_play(play, strategy0, strategy1, score0, score1, dice, goal, say, feral_hogs):
+def trace_play(play, strategy0, strategy1, score0, score1, dice, goal, say):
     """Wraps the user's play function and
         (1) ensures that strategy0 and strategy1 are called exactly once per turn
         (2) records the entire game, returning the result as a list of dictionaries,
@@ -152,7 +157,6 @@ def trace_play(play, strategy0, strategy1, score0, score1, dice, goal, say, fera
         dice=mod_dice,
         goal=goal,
         say=safe(say),
-        feral_hogs=feral_hogs,
     )
     return s0, s1, game_trace
 

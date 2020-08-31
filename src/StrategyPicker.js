@@ -41,7 +41,7 @@ export default function StrategyPicker({ strategy, onStrategyChange } : Props) {
                 <FormControl as="select" onChange={handleSelect} value={selected}>
                     <option disabled hidden>{defaultString}</option>
                     <option>bacon_strategy</option>
-                    <option>swap_strategy</option>
+                    <option>extra_turn_strategy</option>
                     <option>final_strategy</option>
                 </FormControl>
             </InputGroup>
