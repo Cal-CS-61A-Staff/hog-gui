@@ -53,7 +53,7 @@ export default function Game({
         setState(states.ROLLING_DICE);
         setNumRolls(inputNumRolls);
         moveHistory.current.push(inputNumRolls);
-        const [{ message: newMessage, rolls, finalScores }] = await Promise.all([
+        const [{ message: newMessage, rolls, finalScores, who }] = await Promise.all([
             post("/take_turn", {
                 prevRolls: rollHistory.current,
                 moveHistory: moveHistory.current,
@@ -68,7 +68,7 @@ export default function Game({
         setMessage(newMessage);
         rollHistory.current = rolls;
         await wait(2500);
-        setPlayerIndex(1 - currPlayerIndex);
+        setPlayerIndex(who);
         if (Math.max(...finalScores) >= goal) {
             setState(states.GAME_OVER);
         } else if (currPlayerIndex === 0 && strategy) {

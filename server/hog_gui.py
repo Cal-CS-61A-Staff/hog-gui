@@ -20,6 +20,7 @@ class HogLoggingException(Exception):
 
 @route
 def take_turn(prev_rolls, move_history, goal, game_rules):
+    """Simulate the whole game up to the current turn."""
     fair_dice = dice.make_fair_dice(6)
     dice_results = []
 
@@ -43,6 +44,7 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
 
         final_scores = None
         final_message = None
+        who = 0
 
         commentary = hog.both(
             hog.announce_highest(0),
@@ -59,21 +61,25 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
 
         move_cnt = 0
 
-        def strategy(*scores):
-            nonlocal final_scores, move_cnt
-            final_scores = scores
-            if move_cnt % 2:
-                final_scores = final_scores[::-1]
-            if move_cnt == len(move_history):
-                raise HogLoggingException()
-            move = move_history[move_cnt]
-            move_cnt += 1
-            return move
+        def strategy_for(player):
+            def strategy(*scores):
+                nonlocal final_scores, move_cnt, who
+                final_scores = scores
+                if player:
+                    final_scores = final_scores[::-1]
+                who = player
+                if move_cnt == len(move_history):
+                    raise HogLoggingException()
+                move = move_history[move_cnt]
+                move_cnt += 1
+                return move
+            return strategy
 
         game_over = False
 
         try:
-            final_scores = trace_play(hog.play, strategy, strategy, 0, 0, dice=logged_dice, say=log, goal=goal)[:2]
+            final_scores = trace_play(hog.play, strategy_for(0), strategy_for(1),
+                                      0, 0, dice=logged_dice, say=log, goal=goal)[:2]
         except HogLoggingException:
             pass
         else:
@@ -89,6 +95,7 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
         "finalScores": final_scores,
         "message": final_message,
         "gameOver": game_over,
+        "who": who,
     }
 
 
