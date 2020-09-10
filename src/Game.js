@@ -71,12 +71,12 @@ export default function Game({
         setPlayerIndex(who);
         if (Math.max(...finalScores) >= goal) {
             setState(states.GAME_OVER);
-        } else if (currPlayerIndex === 0 && strategy) {
+        } else if (who == 1 && strategy) {
             const nextMove = await post("/strategy", { name: strategy, scores });
             setNumRolls(nextMove);
             setState(states.DISPLAYING_COMPUTER_MOVE);
             await wait(2500);
-            return handleRoll(nextMove, 1 - currPlayerIndex);
+            return handleRoll(nextMove, who);
         } else {
             setState(states.WAITING_FOR_INPUT);
         }
